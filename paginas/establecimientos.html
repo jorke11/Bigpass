@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title></title>
+
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+
+        <link rel="stylesheet" href="../css/bootstrap.css">
+        <link rel="stylesheet" href="../css/main.css">
+
+        <script src="../js/vendor/jquery-1.10.1.min.js"></script>
+        <script src="../js/vendor/bootstrap.js"></script>
+        <script src="../js/jquery.soap.js"></script>
+
+
+
+        <script type="text/javascript">
+        $(function(){
+            var texto="";
+            var paramstr = window.location.search.substr(1);
+            var paramarr = paramstr.split ("&");
+            
+            var arreglouser = paramarr[0].split("=");
+            var tarjeta=arreglouser[1];
+
+           
+            $.soap({
+                    url: 'http://192.168.1.141/bigpass/webservice/servicio.php/',
+                    //url: 'http://crm.bigpass.com.co/crm/pruebas/webWS/ws_servidor_7.php/',
+                    method: 'consultarSaldo',
+
+                    data: {
+                        tarjeta:tarjeta
+                        
+                    },
+
+                    success: function (soapResponse) {
+
+                        $(soapResponse.toXML()).find("consultarSaldoResponse").each(function () {
+                            var respuesta = $(this).find('respuestaSal').text();
+                            var json = $.parseJSON(respuesta);
+                            console.log(respuesta);
+                            if(respuesta != '"no"'){
+                                $.each(json,function(i,val){
+                                    texto="<tr><td>"+val.id+"</td><td>"+val.usuario+"</td><td><a href='movimientos.html?id="+val.producto+"'>"+val.producto+"</a></td><td>"+val.valor+"</td></tr>";
+                                    $("#tarjetas").append(texto);
+                                });
+                            }else{
+                                $("#error").append('El Usuario no cuenta con Tarjetas');
+                            }
+
+                        });
+                                      
+                    },
+                    error: function (SOAPResponse) {
+                        // show error
+                    }
+
+            });
+                    
+        });
+        </script>
+    </head>
+    <body>
+        
+        <header class="container">
+            <div class="row ">
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                    <img src="../img/edenred.jpg" class="img-responsive adaptar" >
+                </div>
+                    
+            </div>
+        </header>
+
+        <div class="container">
+            <div class="row">
+            <nav class='nav navbar navbar-default'>
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                    <span class='sr-only'>Cambiar navegacion</span>
+                    <span class='icon-bar'></span>
+                    <span class='icon-bar'></span>
+                    <span class='icon-bar'></span>
+                </button>
+                <a href="#" class='navbar-brand'>Big Pass</a>
+            </div>
+
+            <div class="collapse navbar-collapse navbar-ex1-collapse">
+                    <ul class="nav navbar-nav">
+                        <li><a href="../index.html">Inicio</a></li>
+                        <li><a href="consulta.html">Saldos</a></li>
+                        <li><a href="establecimientos.html">Establecimientos</a></li>
+                    </ul>
+                </div>
+        </nav>        
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4">
+                    &nbsp;
+                </div>
+
+                <div class="col-lg-4">
+                    <form role="form">
+                        <div class="form-group">
+                            <label for="Establecimiento">Establecimiento</label>
+                            <input type="text" name="Establecimiento" id="Establecimiento" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <button type="button" id="enviar" class="btn btn-default">Buscar</button>
+                        </div>
+                    
+                    </form>
+                </div>
+
+                <div class="col-lg-4">
+                    &nbsp;
+                </div>
+                
+            </div>
+        </div>
+
+    </body>
+</html>
